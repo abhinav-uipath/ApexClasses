@@ -1,0 +1,7 @@
+Select id, Amount__c, Matched_Colour__c, Reference1__c, Reference2__c, Reference3__c, Reference4__c, Reference5__c, Collection_Date__c,
+
+                                                        Amount_Received_After_30_Days__c, Amount_Received_After_20_Days__c, Amount_Received_After_10_Days__c, Amount_Received_Before_10_Days__c
+
+                                                        from Inbound_Report__c WHERE Amount__c>0 and Collection_Date__c<=Today and Matched_Colour__c = 'Red' and recordType.name = 'EWI Inbound Report'
+
+                                                        and (NOT Reference1__c like '%44576714%') order by Collection_Date__c desc
