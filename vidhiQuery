@@ -1,0 +1,79 @@
+select Id, Status__c, Contact__c, Contact__r.Name, Account__r.Name, Account__r.G_Number__c, Account__r.G_Number__pc, Account__r.EWI_Landlord_Id__c,Account__r.EWI_Landlord_User_Id__c, Case__c, Contact__r.Member_Status__c, Case__r.Member_Status__c,
+
+                                Case__r.Evidence_Gathering_Start_Date__c, Case__r.status, Case__r.Deposit_Account_Number__r.First_line_of_address_with_postcode__c, Case__r.Dispute_Reference__c,
+
+                                Case__r.Amount_of_Disputed_Funds_Remaining__c, Case__r.Amount_of_Disputed_Funds_Required__c, Case__r.Amount_of_Disputed_Funds_Received__c, Case__r.Evidence_Gathering_AGLL_DueDate__c,
+
+                                Case__r.Amount_Received_After_30_Days__c, Case__r.Amount_Received_After_20_Days__c, Case__r.Amount_Received_After_10_Days__c, Case__r.Amount_Received_Before_10_Days__c,
+
+                                Case__r.No_of_Times_Chased__c, Case__r.Last_Chased_Date__c, Transaction_Date__c, Transaction_Date_2__c, Case__r.Awaiting_review_Date__c,
+
+                                (Select id, Amount__c, Collection_Date__c, Reference1__c,
+
+                                Amount_Received_After_30_Days__c, Amount_Received_After_20_Days__c, Amount_Received_After_10_Days__c, Amount_Received_Before_10_Days__c
+
+                                from Inbound_Reports__r WHERE Amount__c>0 and Collection_Date__c<=Today and (NOT Reference1__c like '%44576714%') order by Collection_Date__c desc)
+
+                                from Installment__c where Case__c != null and Account__c!=null
+
+                                and (Case__r.Status = 'Evidence gathering agent/landlord' OR
+
+                                Case__r.Status = 'Evidence gathering tenant' OR
+
+                                Case__r.Status = 'Evidence review complete' OR
+
+                                Case__r.Status = 'Adjudication' OR
+
+                                Case__r.Status = 'Deposit to be repaid - resolved without adjudication' OR
+
+                                Case__r.Status = 'Deposit to be repaid - decision issued' OR
+
+                                Case__r.Status = 'On Hold' OR
+
+                                Case__r.Status = 'Awaiting Review' OR
+
+                                Case__r.Status = 'Potential insurance claim - pending information' OR
+
+                                Case__r.Status = 'Clarification needed' OR
+
+                                Case__r.Status = 'Consent to resolution not given' OR
+
+                                Case__r.Status = 'Decision issued – dispute monies outstanding' OR
+
+                                Case__r.Status = 'Deposit to be repaid - Court order' OR
+
+                                Case__r.Status = 'Deposit to be repaid - no proof of court action' OR
+
+                                Case__r.Status = 'Decision issued – insurance claim' OR
+
+                                Case__r.Status = 'Decision issued - with legal' OR
+
+                                Case__r.Status = 'Overpayments' OR
+
+                                Case__r.Status = 'Case closed – Resolved without adjudication' OR
+
+                                Case__r.Status = 'Deposit closed - deposit repaid in part' OR
+
+                                Case__r.Status = 'Deposit closed - deposit repaid in full' OR
+
+                                Case__r.Status = 'Case closed – court order' OR
+
+                                Case__r.Status = 'Case closed - Court case' OR
+
+                                Case__r.Status = 'Complaint closed' OR
+
+                                Case__r.Status = '4 - Medium level complaint' OR
+
+                                Case__r.Status = '5 - High level complaint' OR
+
+                                Case__r.Status = 'Case closed – no dispute')
+
+                                and Case__r.Amount_of_Disputed_Funds_Remaining__c>0 and ((Case__r.Evidence_Gathering_Start_Date__c!=null AND Case__r.Evidence_Gathering_AGLL_DueDate__c <=today) OR Case__r.Awaiting_review_Date__c !=null )  
+
+                                and (Installment_Type__c = 'Receivable' and Status__c = 'Pending')
+
+                                and (Account__r.G_Number__c !=null OR Account__r.G_Number__pc !=null OR Account__r.EWI_Landlord_User_Id__c !=null)
+
+                                and case__r.recordtype.Name = 'Dispute EW Insured'
+
+                                order by Account__r.G_Number__c asc, Account__r.EWI_Landlord_User_Id__c asc, Case__r.Evidence_Gathering_AGLL_DueDate__c desc
