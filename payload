@@ -94,4 +94,216 @@
 
 
 =========================================================================================================
+	
+{
+"dispute_id": "EWI00000177",
+"type": "agent",
+"firstname": "Spicerhaart",
+"surname": "Lettings",
+"email": "property.management@spicerhaart.co.uk"
+}
+
+
+{
+"dispute_id": "EWI00000177",
+"type": "agent",
+"firstname": "Anuja",
+"surname": "Sen",
+"email": "anuja.sen@tenancydepositscheme.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "agent",
+"firstname": "Spicerhaart",
+"surname": "Lettings",
+"email": "property.management@spicerhaart.co.uk"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+	
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+	
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+	
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+	
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "agent",
+"firstname": "Sanam",
+"surname": "Khan",
+"email": "sanam.khan@tenancydepositscheme.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+
+{
+"dispute_id": "EWI00000177",
+"type": "tenant",
+"firstname": "S",
+"surname": "Edwards",
+"email": "ss.preciousgifts@yahoo.com"
+}
+
+	
+Case:{Id=5008d00000QkdecAAB, V_External_Id__c=EWI00000177, Status=Proposal submitted – awaiting agent/landlord response, Deposit_Account_Number__c=a0L8d0000020eR2EAI, Disputed_Funds_Received__c=false, No_Landlord_Evidence__c=false, No_Tenant_Evidence__c=false}------------------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stage_text"
+
+Proposal submitted - awaiting agent/landlord response
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+Case:{Id=5008d00000QkdecAAB, V_External_Id__c=EWI00000177, Status=Proposal submitted – awaiting tenant response, Deposit_Account_Number__c=a0L8d0000020eR2EAI, Disputed_Funds_Received__c=false, No_Landlord_Evidence__c=false, No_Tenant_Evidence__c=false}------------------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stage_text"
+
+Proposal submitted - awaiting tenant response
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+Case:{Id=5008d00000QkdecAAB, V_External_Id__c=EWI00000177, Status=Self-resolution, Deposit_Account_Number__c=a0L8d0000020eR2EAI, Disputed_Funds_Received__c=false, No_Landlord_Evidence__c=false, No_Tenant_Evidence__c=false}------------------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stage_text"
+
+Self-resolution
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
