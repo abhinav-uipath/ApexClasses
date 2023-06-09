@@ -1,0 +1,97 @@
+{
+    "Objects": {
+        "dispute": {
+            "applicant": "Tenant",
+            "dispute_id": "EWI00000177",
+            "user": {
+                "user_id": "174558",
+                "email": "ss.preciousgifts@yahoo.com",
+                "firstname": "S",
+                "surname": "Edwards"
+            }
+        },
+        "member": {
+            "member_id": "848",
+            "g_number": "G01005",
+            "member_name": "Spicer Haart Residential Lettings Ltd",
+            "email": "Sian.tyler@spicerhaart.co.uk",
+            "sage_category": "1A",
+            "member_status": "Member",
+            "note": "Agent has confirmed bank details for all SpicerHaart Payments as::\r\nAccount Number: 43664171\r\nAccount Name: Spicerhaart Residential Lettings Client Deposit Account\r\nSort Code: 401203\r\nBank: HSBC",
+            "approved_bodies": {
+                "arla": true,
+                "arma": false,
+                "balma": false,
+                "glm": false,
+                "gorl": false,
+                "corporate": false,
+                "ha": false,
+                "law_society": false,
+                "naea": false,
+                "safeagent": false,
+                "nforl": false,
+                "nla": false,
+                "oea": false,
+                "other_body": false,
+                "rics": false,
+                "rsl": false,
+                "tls": false,
+                "tpos": false,
+                "ukala": false,
+                "none": false
+            },
+            "branch": {
+                "branch_id": "848::16010",
+                "branch_name": "Haart - Leicester",
+                "branch_status": "Open"
+            }
+        },
+        "landlord": {
+            "landlord_type": "Non Member",
+            "landlord_id": "848::16010::P0018D5011-19937797",
+            "firstname": "Ms Hanna",
+            "surname": "Najeme"
+        }
+    },
+    "FormData": {
+        "tenancy": {
+            "end_date": "2023-02-28",
+            "start_date": "2020-05-29",
+            "deposit_amount": "721.15",
+            "deposit_protection_start_date": "2020-05-29",
+            "non_managed": "false",
+            "tenancy_type": "Agent",
+            "paon": "35",
+            "street": "Malsbury Avenue",
+            "locality": "Scraptoft",
+            "town": "Leicester",
+            "country": "United Kingdom",
+            "postcode": "LE7 9FQ",
+            "number_of_tenants": 1,
+            "unique_id": "YtArhZ",
+            "tenancy_id": "848::16010::P0018D5011-19937797::Q1613F2304-F8591BE8",
+            "depository": "false"
+        },
+        "tenant": {
+            "tenant_1": {
+                "email": "ss.preciousgifts@yahoo.com",
+                "title": "Miss",
+                "firstname": "S",
+                "surname": "Edwards",
+                "country": "United Kingdom"
+            }
+        },
+        "agent": {
+            "email": "Saira.Chaudhary@haart.co.uk",
+            "title": "Miss",
+            "firstname": "Saira",
+            "surname": "Chaudhary",
+            "member_name": "Spicer Haart Residential Lettings Ltd",
+            "country": "United Kingdom"
+        }
+    }
+}
+
+
+=========================================================================================================
+
