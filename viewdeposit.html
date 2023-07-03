@@ -1,0 +1,930 @@
+<aura:component access="global" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                controller="ViewDepositController">
+     
+    <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"></aura:handler>
+    <aura:attribute name="currentUser" type="User" />
+    <force:recordData aura:id="recordLoader" recordId="{!$SObjectType.CurrentUser.Id}" 
+                      fields="Name, Profile.Name, TestName__c,Contact.Job_role__c, Contact.Additional_Permission__c, 
+                              Move_To_Certificate_Payment__c" 
+                      targetFields="{!v.currentUser}" 
+                      recordUpdated="{!c.getCurrentUser}" />
+    <aura:attribute name="PageSpinner" type="boolean" default="true"/>
+    
+    <aura:attribute name="registeredNotPaidNumber" type="Integer" default="0"/>
+    <aura:attribute name="paymentSentToSafeDepositNumber" type="Integer" default="0"/>
+    <aura:attribute name="heldBySafeDepositNumber" type="Integer" default="0"/>
+    <aura:attribute name="repaymentRequestedTenantNumber" type="Integer" default="0"/>
+    <aura:attribute name="repaymentRequestedAgentLandlordNumber" type="Integer" default="0"/>
+    <aura:attribute name="selfResolutionNumber" type="Integer" default="0"/>
+    <aura:attribute name="inDisputeResolutionNumber" type="Integer" default="0"/>
+    <aura:attribute name="paymentApprovedNumber" type="Integer" default="0"/>
+    <aura:attribute name="depositRepaymentNumber" type="Integer" default="0"/>
+    <aura:attribute name="registeredNotPaidAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="paymentSentToSafeDepositAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="heldBySafeDepositAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="repaymentRequestedTenantAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="repaymentRequestedAgentLandlordAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="selfResolutionAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="inDisputeResolutionAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="paymentApprovedAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="depositRepaymentAmount" type="Decimal" default="0.00"/>
+    <aura:attribute name="registeredNotPaidRecords" type="Object"/>
+    <aura:attribute name="paymentSentToSafeDepositRecords" type="Object"/>
+    <aura:attribute name="heldBySafeDepositRecords" type="Object"/>
+    <aura:attribute name="repaymentRequestedTenantRecords" type="Object"/>
+    <aura:attribute name="repaymentRequestedAgentLandlordRecords" type="Object"/>
+    <aura:attribute name="selfResolutionRecords" type="Object"/>
+    <aura:attribute name="inDisputeResolutionRecords" type="Object"/>
+    <aura:attribute name="paymentApprovedRecords" type="Object"/>
+    <aura:attribute name="depositRepaymentRecords" type="Object"/>
+    <aura:attribute name="listOfAllDeposits" type="Object"/>
+    <aura:attribute name="searchText" type="string"/>
+    <aura:attribute name="displaySerachDepositRecords" type="Boolean" default="false"/>
+    <aura:attribute name="reviewTransfer" type="Boolean" default="false"/>
+    <aura:attribute name="reviewTransferNumber" type="Integer" default="1"/>
+    <aura:attribute name="redirectFromPayment" type="boolean" default="false"/>
+    <aura:attribute name="branchid" type="list"/>
+    <!-- HideAction on the basis of roles and permissions -->
+    <aura:attribute name="addDeposit" type="boolean" default="false"/>
+    
+    <aura:attribute name="depositChangeOverId" type="Case[]" />
+    <aura:attribute name="branchUser" type="Boolean" default="true"/>
+    <aura:attribute name="reviewTenantChangeOver" type="Boolean" default="false"/>
+    <aura:attribute name="reviewreviewTenantChangeOverNumber" type="Integer" default="0"/>
+    <aura:attribute name="allDepositsList" type="List" />
+    
+    <!-- Pagination for registered not paid -->
+    <aura:attribute name="paginationListRNP" type="List" />
+    <aura:attribute name="startPageRNP" type="Integer" />
+    <aura:attribute name="endPageRNP" type="Integer" />  
+    <aura:attribute name="currentPageRNP" type="integer" default="1" />
+    <aura:attribute name="pageSizeRNP" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountRNP" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountRNP" type="Integer" />
+    
+    <!-- Pagination for Awaiting Payment -->
+    <aura:attribute name="paginationListAP" type="list" />
+    <aura:attribute name="startPageAP" type="Integer" />
+    <aura:attribute name="endPageAP" type="Integer" />  
+    <aura:attribute name="currentPageAP" type="integer" default="1" />
+    <aura:attribute name="pageSizeAP" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountAP" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountAP" type="Integer" />
+    
+    <!-- Pagination for Deposit Help by Scheme -->
+    <aura:attribute name="paginationListDHBS" type="list" />
+    <aura:attribute name="startPageDHBS" type="Integer" />
+    <aura:attribute name="endPageDHBS" type="Integer" />  
+    <aura:attribute name="currentPageDHBS" type="integer" default="1" />
+    <aura:attribute name="pageSizeDHBS" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountDHBS" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountDHBS" type="Integer" />
+    
+    <!-- Pagination for Repayment requested by tenant -->
+    <aura:attribute name="paginationListRRbyTenant" type="list" />
+    <aura:attribute name="startPageRRbyTenant" type="Integer" />
+    <aura:attribute name="endPageRRbyTenant" type="Integer" />  
+    <aura:attribute name="currentPageRRbyTenant" type="integer" default="1" />
+    <aura:attribute name="pageSizeRRbyTenant" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountRRbyTenant" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountRRbyTenant" type="Integer" />
+    
+    <!-- Pagination for Repayment requested by agent/landlord -->
+    <aura:attribute name="paginationListRRbyAGLL" type="list" />
+    <aura:attribute name="startPageRRbyAGLL" type="Integer" />
+    <aura:attribute name="endPageRRbyAGLL" type="Integer" />  
+    <aura:attribute name="currentPageRRbyAGLL" type="integer" default="1" />
+    <aura:attribute name="pageSizeRRbyAGLL" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountRRbyAGLL" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountRRbyAGLL" type="Integer" />
+    
+    <!-- Pagination for Repayment not agreed - In self-resolution -->
+    <aura:attribute name="paginationListRnotAgrdSR" type="list" />
+    <aura:attribute name="startPageRnotAgrdSR" type="Integer" />
+    <aura:attribute name="endPageRnotAgrdSR" type="Integer" />  
+    <aura:attribute name="currentPageRnotAgrdSR" type="integer" default="1" />
+    <aura:attribute name="pageSizeRnotAgrdSR" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountRnotAgrdSR" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountRnotAgrdSR" type="Integer" />
+    
+    <!-- Pagination for Repayment not agreed - In dispute resolution -->
+    <aura:attribute name="paginationListRnotAgrdDR" type="list" />
+    <aura:attribute name="startPageRnotAgrdDR" type="Integer" />
+    <aura:attribute name="endPageRnotAgrdDR" type="Integer" />  
+    <aura:attribute name="currentPageRnotAgrdDR" type="integer" default="1" />
+    <aura:attribute name="pageSizeRnotAgrdDR" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountRnotAgrdDR" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountRnotAgrdDR" type="Integer" />
+    
+    <!-- Pagination for Repayment process -->
+    <aura:attribute name="paginationListRP" type="list" />
+    <aura:attribute name="startPageRP" type="Integer" />
+    <aura:attribute name="endPageRP" type="Integer" />  
+    <aura:attribute name="currentPageRP" type="integer" default="1" />
+    <aura:attribute name="pageSizeRP" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountRP" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountRP" type="Integer" />
+    
+    <!-- Pagination for Deposit repayments concluded in the last year -->
+    <aura:attribute name="paginationListDRCLY" type="list" />
+    <aura:attribute name="startPageDRCLY" type="Integer" />
+    <aura:attribute name="endPageDRCLY" type="Integer" />  
+    <aura:attribute name="currentPageDRCLY" type="integer" default="1" />
+    <aura:attribute name="pageSizeDRCLY" type="Integer" default="10" description="number of records to be display on per page"/> 
+    <aura:attribute name="totalPagesCountDRCLY" type="integer" default="1" />
+    <aura:attribute name="totalRecordsCountDRCLY" type="Integer" />
+    
+    <!-- Handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    
+    <!-- Navigation Service -->
+    <lightning:navigation aura:id="navService" />
+    
+    <aura:renderIf isTrue="{!v.PageSpinner}">
+        <div class="lds-dual-ring">
+        </div>
+        
+        <aura:set attribute="else">
+            <aura:if isTrue="{!and(v.redirectFromPayment == false ,v.currentUser.Move_To_Certificate_Payment__c)}">
+                <c:MapDraftToDeposite/>
+                <aura:set attribute="else">
+                    <!--    <aura:if isTrue="{!and(v.currentUser.Profile.Name == 'Branch User',v.branchUser)}">
+                                <c:EI_BranchSelection/>
+                                   <aura:set attribute="else">
+                              
+                          
+                            
+                           <aura:renderIf isTrue="{!v.reviewTenantChangeOver}">
+                                <aura:iteration items="{!v.depositChangeOverId}" var="depId">
+                                    <div style="font-size:1.3rem;" class="slds-text-color_error slds-p-left_x-small">
+                                        You have pending tenant changeover for : &nbsp;<b> {!depId.Deposit_Account_Number__r.Deposit_Account_Number__c}</b>&nbsp;
+                                        <lightning:button variant="brand" name="{!depId.Deposit_Account_Number__r.Id}" label="View Tenant ChangeOver" onclick="{!c.reviewChangeOver}"/>
+                                    </div>
+                                    
+                                </aura:iteration>
+                            </aura:renderIf>  -->  
+                    <!--  Transfer deposit functionality currently hidden by Vidhi Agrawal 5/may/2022 start  -->
+                
+                 
+                    
+                    <body>
+                        
+                        <!-- Change Detail HTML Start -->
+                        <div class="resource-center">
+                   
+                            <div class="tab-content custom-tab-content" id="sf-tabContent">
+                                <div class="tab-pane fade show active" id="sf-deposit" role="tabpanel" aria-labelledby="sf-deposit-tab">
+                                    
+                                    <!-- Protect Search HTML Start -->
+                                    <section class="protect-search">
+                                        <div class="container">
+                                        <aura:if isTrue="{!v.reviewTransferNumber}">
+                                            <div class="slds-text-color_error slds-p-left_x-small" style="font-size: 14px">
+                                                You have {!v.reviewTransferNumber} deposit(s) pending that have been selected to transfer to your account
+                                                <lightning:button variant="brand"  class="see-all" label="Review transfers" onclick="{!c.viewRevewTransferredDeposits}"/>
+                                            </div>
+                                              <BR></BR>
+                                              <BR></BR>
+                                        </aura:if>  
+                                          
+                                            
+                                            <div class="row">
+                                                
+                                                <div class="col-sm-6">
+                                                    <aura:if isTrue="{!v.currentUser.Profile.Name == 'Branch User'}">
+                                                        
+                                                        <a href="" class="go-back" onclick="{!c.backtobranch}"><img src="{!$Resource.TDSTheme + '/assets/img/md-arrow-dropleft.png'}" alt="Back Icon"/> Back to branch selection</a>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!v.currentUser.Profile.Name == 'Head Office User'}">
+                                                        
+                                                        <a href="" class="go-back" onclick="{!c.backtobranch}"><img src="{!$Resource.TDSTheme + '/assets/img/md-arrow-dropleft.png'}" alt="Back Icon"/> Back to branch management</a>
+                                                    </aura:if>&nbsp;&nbsp;
+                                                    <aura:if isTrue="{!v.addDeposit}"> 
+                                                        <a href="" class="see-all" onclick="{!c.addDeposit}">Protect a new deposit</a>
+                                                    </aura:if>
+                                                </div>
+                                                
+                                                <div class="col-sm-6">
+                                                    <div class="filter-search">
+                                                        <input type="text" onkeypress="{!c.searchproperty}" id="searchValue" class="form-control" placeholder="Enter your search here...." value="{!v.searchText}"/>
+                                                        <button type="button" onclick="{! c.handleClick }"></button>
+                                                        <!--<ui:inputText value="{!v.searchText}" class="form-control" placeholder="Search" />
+          <lightning:buttonIcon iconName="utility:search" variant="bare" onclick="{! c.handleClick }" alternativeText="Enter your search here...." class="slds-input__icon" />-->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <!-- Protect Search HTML End -->
+                                    
+                                    <!-- Table HTML Start -->
+                                    <div class="container mt-5">
+                                        <div class="at-container">
+                                            <div id="accordion-at" class="accordion">
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader1" class="card-header collapsed " type="button" data-toggle="collapse" data-target="#collapseOne" aria-controls="collapseOne">
+                                                        <div class="card-title" >
+                                                            <div class="container" >
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader11">
+                                                                        {!$Label.c.Registered_not_paid}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader12">
+                                                                        {!v.registeredNotPaidNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader13">
+                                                                        <lightning:formattedNumber value="{!v.registeredNotPaidAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseOne" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_to_Pay}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:if isTrue="{!not(empty(v.paginationListRNP))}"> <!-- registeredNotPaidRecords -->
+                                                                        <aura:iteration items="{!v.paginationListRNP}" var="obj">
+                                                                            <tr>													
+                                                                                <td style="width:40%;"><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                                <td>{!obj.Start_Date_Text__c}</td>
+                                                                                <!--<td>{!obj.Deposit_Amount__c}</td>-->
+                                                                                <td><lightning:formattedNumber value="{!obj.Deposit_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                                <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                                <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                                <td>
+                                                                                    <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img  src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </aura:iteration>
+                                                                        <aura:set attribute="else">
+                                                                            {!$Label.c.NoUnprotectedDeposits}
+                                                                        </aura:set>
+                                                                    </aura:if>     
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for registered not paid -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageRNP == 0,v.paginationListRNP.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageRNP}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageRNP} out of {!v.totalPagesCountRNP}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageRNP + 1) >= v.totalRecordsCountRNP,v.paginationListRNP.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageRNP}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader2" class="card-header collapsed " type="button" data-toggle="collapse" data-target="#collapseTwo" aria-controls="collapseTwo">
+                                                        <div class="card-title">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader21">
+                                                                        {!$Label.c.Awaiting_receipt_of_deposit}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader22">
+                                                                        {!v.paymentSentToSafeDepositNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader23">
+                                                                        <lightning:formattedNumber value="{!v.paymentSentToSafeDepositAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseTwo" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Payment_expected}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:if isTrue="{!not(empty(v.paginationListAP))}"> <!-- paymentSentToSafeDepositRecords -->
+                                                                        <aura:iteration items="{!v.paginationListAP}" var="obj">
+                                                                            <tr>													
+                                                                                <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                                <td>{!obj.Start_Date_Text__c}</td>
+                                                                                <td><lightning:formattedNumber value="{!obj.Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                                <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                                <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                                <td>
+                                                                                    <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </aura:iteration>
+                                                                        <aura:set attribute="else">
+                                                                            <tr>													
+                                                                                <td>{!$Label.c.NoDepositsNotEqualAmount}</td>
+                                                                            </tr>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Awaiting Payment -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageAP == 0,v.paginationListAP.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageAP}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageAP} out of {!v.totalPagesCountAP}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageAP + 1) >= v.totalRecordsCountAP,v.paginationListAP.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageAP}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader3" class="card-header collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-controls="collapseThree">
+                                                        <div class="card-title">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader31">
+                                                                        {!$Label.c.Deposits_held_by_SafeDeposits_Scotland}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader32">
+                                                                        {!v.heldBySafeDepositNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader33">
+                                                                        <lightning:formattedNumber value="{!v.heldBySafeDepositAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseThree" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListDHBS}" var="obj"> <!-- heldBySafeDepositRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Deposit held by Scheme -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageDHBS == 0,v.paginationListDHBS.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageDHBS}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageDHBS} out of {!v.totalPagesCountDHBS}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageDHBS + 1) >= v.totalRecordsCountDHBS,v.paginationListDHBS.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageDHBS}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader4" class="card-header collapsed" type="button" data-toggle="collapse" data-target="#collapseFour"  aria-controls="collapseFour">
+                                                        <div class="card-title" >
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader41">
+                                                                        {!$Label.c.Repayment_requested_by_tenant}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader42">
+                                                                        {!v.repaymentRequestedTenantNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader43">
+                                                                        <lightning:formattedNumber value="{!v.repaymentRequestedTenantAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseFour" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Respond_Deadline}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListRRbyTenant}" var="obj"> <!-- repaymentRequestedTenantRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <lightning:formattedDateTime value="{!obj.Cases__r[0].Respond_Date__c}" year="numeric" month="numeric" day="numeric" />       
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Repayment requested by tenant -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageRRbyTenant == 0,v.paginationListRRbyTenant.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageRRbyTenant}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageRRbyTenant} out of {!v.totalPagesCountRRbyTenant}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageRRbyTenant + 1) >= v.totalRecordsCountRRbyTenant,v.paginationListRRbyTenant.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageRRbyTenant}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader5" class="card-header collapsed" type="button" data-toggle="collapse" data-target="#collapseFive" aria-controls="collapseFive">
+                                                        <div class="card-title">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader51">
+                                                                        {!$Label.c.Repayment_requested_by_agent_landlord}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader52">
+                                                                        {!v.repaymentRequestedAgentLandlordNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader53">
+                                                                        <lightning:formattedNumber value="{!v.repaymentRequestedAgentLandlordAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseFive" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Respond_Deadline}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListRRbyAGLL}" var="obj"> <!-- repaymentRequestedAgentLandlordRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <lightning:formattedDateTime value="{!obj.Cases__r[0].Respond_Date__c}" year="numeric" month="numeric" day="numeric" />       
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Repayment requested by agent/landlord -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageRRbyAGLL == 0,v.paginationListRRbyAGLL.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageRRbyAGLL}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageRRbyAGLL} out of {!v.totalPagesCountRRbyAGLL}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageRRbyAGLL + 1) >= v.totalRecordsCountRRbyAGLL,v.paginationListRRbyAGLL.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageRRbyAGLL}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader6" class="card-header collapsed"  type="button" data-toggle="collapse" data-target="#collapseSix" aria-controls="collapseSix">
+                                                        <div class="card-title">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader61">
+                                                                        {!$Label.c.Self_resolution}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader62">
+                                                                        {!v.selfResolutionNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader63">
+                                                                        <lightning:formattedNumber value="{!v.selfResolutionAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseSix" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Respond_Deadline}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListRnotAgrdSR}" var="obj"> <!-- selfResolutionRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <lightning:formattedDateTime value="{!obj.Cases__r[0].Respond_Date__c}" year="numeric" month="numeric" day="numeric" />       
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Repayment not agreed - In self-resolution -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageRnotAgrdSR == 0,v.paginationListRnotAgrdSR.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageRnotAgrdSR}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageRnotAgrdSR} out of {!v.totalPagesCountRnotAgrdSR}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageRnotAgrdSR + 1) >= v.totalRecordsCountRnotAgrdSR,v.paginationListRnotAgrdSR.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageRnotAgrdSR}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader7" class="card-header collapsed" type="button" data-toggle="collapse" data-target="#collapseSeven" aria-controls="collapseSeven">
+                                                        <div class="card-title" id="cardcolor">
+                                                            <div class="container" id="divcolor">
+                                                                <div class="row" id="rowcolor">
+                                                                    <div class="col-md-8 col-6" id="rowHeader71">
+                                                                        {!$Label.c.In_dispute_resolution}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader72">
+                                                                        {!v.inDisputeResolutionNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader73">
+                                                                        <lightning:formattedNumber value="{!v.inDisputeResolutionAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseSeven" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Respond_Deadline}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListRnotAgrdDR}" var="obj"> <!-- inDisputeResolutionRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <lightning:formattedDateTime value="{!obj.Cases__r[0].Respond_Date__c}" year="numeric" month="numeric" day="numeric" />       
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Repayment not agreed - In dispute resolution -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageRnotAgrdDR == 0,v.paginationListRnotAgrdDR.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageRnotAgrdDR}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageRnotAgrdDR} out of {!v.totalPagesCountRnotAgrdDR}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageRnotAgrdDR + 1) >= v.totalRecordsCountRnotAgrdDR,v.paginationListRnotAgrdDR.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageRnotAgrdDR}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader8" class="card-header collapsed"  type="button" data-toggle="collapse" data-target="#collapseEight" aria-controls="collapseEight">
+                                                        <div class="card-title">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader81">
+                                                                        {!$Label.c.Repayment_process}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader82">
+                                                                        {!v.paymentApprovedNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader83">
+                                                                        <lightning:formattedNumber value="{!v.paymentApprovedAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseEight" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Respond_Deadline}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListRP}" var="obj"> <!-- paymentApprovedRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <lightning:formattedDateTime value="{!obj.Cases__r[0].Respond_Date__c}" year="numeric" month="numeric" day="numeric" />       
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Repayment process -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageRP == 0,v.paginationListRP.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageRP}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageRP} out of {!v.totalPagesCountRP}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageRP + 1) >= v.totalRecordsCountRP,v.paginationListRP.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageRP}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div id="cardHeader9" class="card-header collapsed" type="button" data-toggle="collapse" data-target="#collapseNine" aria-controls="collapseNine">
+                                                        <div class="card-title">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-md-8 col-6" id="rowHeader91">
+                                                                        {!$Label.c.Deposits_repaid_in_the_last_year}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader92">
+                                                                        {!v.depositRepaymentNumber}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-3" id="rowHeader93">
+                                                                        <lightning:formattedNumber value="{!v.depositRepaymentAmount}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseNine" class="card-body collapse" data-parent="#accordion-at">
+                                                        <div class="table-container-at">
+                                                            <table id="table" class="display table-at table w-100" cellspacing="0" style="word-wrap:break-word;table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Address}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Start_Date}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_held}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Deposit_Account_Number}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Number_of_Tenants}</th>
+                                                                        <th style="font-weight: bold;">{!$Label.c.Respond_Deadline}</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <aura:iteration items="{!v.paginationListDRCLY}" var="obj"> <!-- depositRepaymentRecords -->
+                                                                        <tr>													
+                                                                            <td><aura:unescapedHtml value="{!obj.Property_Address_Without_Country__c}" /></td>
+                                                                            <td>{!obj.Start_Date_Text__c}</td>
+                                                                            <td><lightning:formattedNumber value="{!obj.Actual_Protected_Amount__c}" style="currency" currencyCode="GBP" minimumFractionDigits="2" maximumFractionDigits="2"/></td>
+                                                                            <td>{!obj.Deposit_Account_Number__c}</td>
+                                                                            <td>{!obj.Number_of_Tenants_Value__c}</td>
+                                                                            <td>
+                                                                                <lightning:formattedDateTime value="{!obj.Cases__r[0].Respond_Date__c}" year="numeric" month="numeric" day="numeric" />       
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="" id="{!obj.Id}" class="tbl-btn" onclick="{!c.handleRowAction}"><img src="{!$Resource.TDSTheme + '/assets/img/View_icon.svg'}" alt="View Icon"/> View / Edit</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </aura:iteration>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        
+                                                        <br/><br/>
+                                                        <!-- Pagination for Deposit repayments concluded in the last year -->
+                                                        <div style="margin-left:420px!important;">
+                                                            <nav aria-label="Page navigation">
+                                                                <ul class="pagination">
+                                                                    <aura:if isTrue="{!or(v.startPageDRCLY == 0,v.paginationListDRCLY.length==0)}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Previous</a></li>
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="previousId" style="width :120px" href="" onclick="{!c.navPageDRCLY}">Previous</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <li class="page-item"><a class="page-link" href="" style="width :120px">Page {!v.currentPageDRCLY} out of {!v.totalPagesCountDRCLY}</a></li>
+                                                                    <aura:if isTrue="{!or((v.endPageDRCLY + 1) >= v.totalRecordsCountDRCLY,v.paginationListDRCLY.length==0 )}">
+                                                                        <li class="page-item disabled"><a class="page-link" href="" >Next</a></li>							
+                                                                        <aura:set attribute="else">
+                                                                            <li class="page-item"><a class="page-link" id="nextId" href="" onclick="{!c.navPageDRCLY}">Next</a></li>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Table HTML End -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </body>
+                </aura:set>
+            </aura:if>
+        </aura:set>
+        
+    </aura:renderIf>
+    
+</aura:component>
